@@ -1,11 +1,7 @@
 :root{
-  /* Bordeaux palette */
   --bgTop:#6b0f14;
   --bgMid:#8b1e24;
   --bgBot:#3f070a;
-
-  --card:#5a0f13cc;
-  --card2:#3a070acc;
 
   --line:rgba(255,255,255,0.18);
   --line2:rgba(255,255,255,0.10);
@@ -16,7 +12,6 @@
 
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
-
 body{
   margin:0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -29,12 +24,12 @@ body{
 /* Layout */
 .wrap{
   width: min(1120px, 94vw);
-  margin: 0 auto 60px;
+  margin: 0 auto 56px;
 }
 
 .hero{
   text-align:center;
-  padding: 18px 10px 6px;
+  padding: 16px 10px 6px;
 }
 
 .leagueLogo{
@@ -46,7 +41,7 @@ body{
   box-shadow: 0 18px 50px rgba(0,0,0,0.35);
   background: rgba(0,0,0,0.08);
   display:block;
-  margin: 8px auto 10px;
+  margin: 6px auto 10px;
 }
 
 .leagueTitle{
@@ -66,9 +61,9 @@ body{
 /* Buttons */
 .actions{
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
-  margin: 18px 0 12px;
+  margin: 18px 0 10px;
 }
 
 .bigBtn{
@@ -79,9 +74,7 @@ body{
   font-size: 18px;
   padding: 16px 14px;
   border-radius: 18px;
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.14), rgba(0,0,0,0.12));
+  background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(0,0,0,0.12));
   border: 1px solid rgba(255,255,255,0.20);
   box-shadow: 0 16px 40px rgba(0,0,0,0.25);
   transition: transform .08s ease, filter .12s ease;
@@ -90,7 +83,7 @@ body{
 .bigBtn:active{ transform: translateY(0px); }
 
 .status{
-  min-height: 22px;
+  min-height: 20px;
   font-weight: 900;
   color: var(--textSoft);
   padding: 2px 2px 10px;
@@ -106,15 +99,10 @@ body{
   box-shadow: 0 22px 55px rgba(0,0,0,0.26);
 }
 
-.panel{
-  margin-top: 16px;
-  overflow: hidden;
-}
+.panel{ margin-top: 14px; overflow: hidden; }
 .isHidden{ display:none; }
 
-.panelHead{
-  padding: 14px 16px 6px;
-}
+.panelHead{ padding: 14px 16px 6px; }
 .panelTitleRow{
   display:flex;
   align-items:center;
@@ -125,9 +113,7 @@ body{
   margin:0;
   font-size: 32px;
   font-weight: 1000;
-  letter-spacing: .3px;
 }
-
 .closeBtn{
   border:none;
   cursor:pointer;
@@ -138,23 +124,21 @@ body{
   color: #111;
   box-shadow: 0 12px 25px rgba(0,0,0,0.18);
 }
-.closeBtn:hover{ filter: brightness(0.97); }
-
 .panelBody{ padding: 10px 14px 18px; }
 
-/* TABLES — strong borders */
+/* Tables */
 .tableWrap{
   overflow:auto;
+  -webkit-overflow-scrolling: touch;
   border-radius: 16px;
   border: 1px solid rgba(255,255,255,0.18);
   background: rgba(0,0,0,0.10);
 }
 
-/* Use border-collapse + explicit borders to show grid */
 .dataTable{
   width: 100%;
   border-collapse: collapse;
-  min-width: 720px;
+  min-width: 760px; /* desktop table width */
 }
 
 .dataTable thead th{
@@ -163,50 +147,28 @@ body{
   z-index: 1;
   background: rgba(0,0,0,0.22);
   backdrop-filter: blur(8px);
-
-  font-weight: 1000;
-  letter-spacing: .6px;
-  text-transform: uppercase;
-
   padding: 14px 14px;
   border-bottom: 2px solid rgba(255,255,255,0.22);
   border-right: 1px solid var(--line);
+  font-weight: 1000;
+  letter-spacing: .6px;
+  text-transform: uppercase;
 }
-
-.dataTable thead th:last-child{
-  border-right: none;
-}
+.dataTable thead th:last-child{ border-right:none; }
 
 .dataTable tbody td{
   padding: 14px 14px;
-  font-weight: 900;
-  color: var(--white);
-
   border-bottom: 1px solid var(--line2);
   border-right: 1px solid var(--line2);
+  font-weight: 900;
 }
+.dataTable tbody td:last-child{ border-right:none; }
 
-.dataTable tbody td:last-child{
-  border-right: none;
-}
+.dataTable tbody tr:nth-child(odd) td{ background: rgba(255,255,255,0.04); }
+.dataTable tbody tr:nth-child(even) td{ background: rgba(0,0,0,0.06); }
+.dataTable tbody tr:hover td{ background: rgba(255,255,255,0.06); }
 
-/* zebra */
-.dataTable tbody tr:nth-child(odd) td{
-  background: rgba(255,255,255,0.04);
-}
-.dataTable tbody tr:nth-child(even) td{
-  background: rgba(0,0,0,0.06);
-}
-
-.dataTable tbody tr:hover td{
-  background: rgba(255,255,255,0.06);
-}
-
-/* Score cell */
-.scoreCell{
-  font-weight: 1000;
-  white-space: nowrap;
-}
+.scoreCell{ font-weight: 1000; white-space: nowrap; }
 
 /* Place badges */
 .posBadge{
@@ -221,7 +183,6 @@ body{
   border: 1px solid rgba(255,255,255,0.18);
   font-weight: 1000;
 }
-
 .pos1{ background: rgba(255,215,0,0.22); border-color: rgba(255,215,0,0.55); }
 .pos2{ background: rgba(192,192,192,0.20); border-color: rgba(192,192,192,0.55); }
 .pos3{ background: rgba(205,127,50,0.20); border-color: rgba(205,127,50,0.55); }
@@ -254,27 +215,17 @@ body{
   overflow:hidden;
 }
 
-.playerAvatar{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
+.playerAvatar{ width:100%; height:100%; object-fit:cover; }
 .playerFallback{
-  width:100%;
-  height:100%;
-  display:grid;
-  place-items:center;
-  font-size:38px;
-  font-weight:1000;
-  color:#fff;
-  background:rgba(0,0,0,.25);
+  width:100%; height:100%;
+  display:grid; place-items:center;
+  font-size:38px; font-weight:1000;
+  color:#fff; background:rgba(0,0,0,.25);
 }
 
 .playerName{
   font-size:22px;
   font-weight:1000;
-  color:#fff;
   margin-bottom:10px;
 }
 
@@ -309,4 +260,62 @@ body{
   color: rgba(255,255,255,0.95);
   font-weight: 1000;
   line-height: 1.55;
+}
+
+/* ✅ MOBILE: turn tables into cards + scale hero/buttons */
+@media (max-width: 860px){
+  .actions{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .leagueTitle{ font-size: 44px; }
+  .leagueLogo{ width: 190px; height: 190px; }
+  .panelTitle{ font-size: 26px; }
+  .dataTable{ min-width: 0; } /* allow card mode */
+}
+
+@media (max-width: 560px){
+  .wrap{ width: min(560px, 92vw); }
+  .hero{ padding-top: 10px; }
+  .leagueLogo{ width: 160px; height: 160px; border-width: 8px; }
+  .leagueTitle{ font-size: 34px; }
+  .leagueSub{ font-size: 13px; }
+  .actions{ grid-template-columns: 1fr; gap: 10px; }
+  .bigBtn{ font-size: 16px; padding: 14px 12px; border-radius: 16px; }
+
+  /* Card-table mode */
+  .tableWrap{ overflow: visible; background: transparent; border: none; }
+  .dataTable{ border-collapse: separate; border-spacing: 0 10px; }
+  .dataTable thead{ display:none; }
+  .dataTable, .dataTable tbody, .dataTable tr, .dataTable td{ display:block; width:100%; }
+
+  .dataTable tr{
+    background: rgba(0,0,0,0.12);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 16px 35px rgba(0,0,0,0.18);
+  }
+
+  .dataTable tbody td{
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.10);
+    padding: 12px 12px;
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 10px;
+    background: transparent !important;
+  }
+  .dataTable tbody td:last-child{ border-bottom: none; }
+
+  .dataTable tbody td::before{
+    content: attr(data-label);
+    font-weight: 1000;
+    letter-spacing: .3px;
+    opacity: .95;
+    color: rgba(255,255,255,0.92);
+    margin-right: 10px;
+    flex: 0 0 auto;
+  }
+
+  .posBadge{ min-width: 34px; height: 28px; padding: 0 10px; }
+  .playerAvatarWrap{ width: 108px; height: 108px; }
 }

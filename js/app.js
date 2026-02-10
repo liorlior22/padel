@@ -1,9 +1,6 @@
 (() => {
   "use strict";
 
-  const TABLE_CSV =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vT5ptE4nm4MeUEjrBtVLg-l19mlLfk_Ng89kPC0OM1JMskfk0CuFhnJeDpS1l7RxbKQPE8L053QT2lt/pub?gid=0&single=true&output=csv";
-
   const ROUNDS_CSV =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vT5ptE4nm4MeUEjrBtVLg-l19mlLfk_Ng89kPC0OM1JMskfk0CuFhnJeDpS1l7RxbKQPE8L053QT2lt/pub?gid=620210277&single=true&output=csv";
 
@@ -12,7 +9,6 @@
 
   let cacheRounds = null;
 
-  // Hebrew bios (ONLY text, UI stays English)
   const PLAYER_BIOS = {
     "Ran Halifa":
       "הוותיק מבין המשתתפים, עם כמות המשחקים הגבוהה ביותר. יציאה מהמקום מהירה מאוד, סובל מפציעות באיברים שונים בגוף. לא אוהב שמגישים אליו סרב, ושחקן הגנה ברמה גבוהה מאוד עם שימוש מצוין בקיר. ללא ספק פייבוריט לסיים את הליגה במקום הראשון.",
@@ -129,15 +125,11 @@
   function parseScore(s) {
     const t = String(s ?? "").trim();
     if (!t) return null;
-
     const clean = t.replace(/[–—−־]/g, "-").replaceAll(":", "-");
     const m = clean.match(/^(\d+)\s*-\s*(\d+)$/);
     if (!m) return null;
-
     const a = Number(m[1]), b = Number(m[2]);
     if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
-
-    // best-of-3 padel: 2-0, 2-1, 1-2, 0-2
     if (!((a === 2 && (b === 0 || b === 1)) || (b === 2 && (a === 0 || a === 1)))) return null;
     return { a, b };
   }
@@ -161,7 +153,6 @@
     return false;
   }
 
-  // images: images/ran.png, images/tal.png, images/omer.png, images/lior.png
   function firstNameSlug(fullName) {
     const n = String(fullName ?? "").trim();
     if (!n) return "";
@@ -192,12 +183,10 @@
     return cacheRounds;
   }
 
-  // standings from rounds only
   function computeStandingsFromRounds(rounds) {
     const h = rounds.headers;
     const rows = rounds.rows;
 
-    // fallback positions: round|p1|p2|vs|p3|p4|score
     const iRound = (() => { const x = findHeaderIndex(h, ["round"]); return x >= 0 ? x : 0; })();
     const iP1    = (() => { const x = findHeaderIndex(h, ["player1","player 1"]); return x >= 0 ? x : 1; })();
     const iP2    = (() => { const x = findHeaderIndex(h, ["player2","player 2"]); return x >= 0 ? x : 2; })();
@@ -205,11 +194,11 @@
     const iP4    = (() => { const x = findHeaderIndex(h, ["player4","player 4"]); return x >= 0 ? x : 5; })();
     const iScore = (() => { const x = findHeaderIndex(h, ["score","result"]); return x >= 0 ? x : 6; })();
 
-    const stats = new Map(); // name -> {name, points, sw, sl}
+    const stats = new Map();
     const ensure = (name) => {
       const n = String(name ?? "").trim();
       if (!n || isPlaceholderName(n)) return null;
-      if (!stats.has(n)) stats.set(n, { name: n, points: 0, sw: 0, sl: 0 });
+      if (!stats.has(n)) stats.set(n, { name:n, points:0, sw:0, sl:0 });
       return stats.get(n);
     };
 
@@ -222,39 +211,34 @@
       const p3 = String(r[iP3] ?? "").trim();
       const p4 = String(r[iP4] ?? "").trim();
 
-      [p1, p2, p3, p4].forEach(ensure);
+      [p1,p2,p3,p4].forEach(ensure);
 
       const sc = parseScore(r[iScore]);
       if (!sc) continue;
 
-      const teamA = [p1, p2].filter((x) => x && !isPlaceholderName(x));
-      const teamB = [p3, p4].filter((x) => x && !isPlaceholderName(x));
+      const teamA = [p1,p2].filter(x => x && !isPlaceholderName(x));
+      const teamB = [p3,p4].filter(x => x && !isPlaceholderName(x));
       if (teamA.length !== 2 || teamB.length !== 2) continue;
 
       const a = sc.a, b = sc.b;
 
-      // sets record
-      teamA.forEach((n) => { const s = ensure(n); if (s) { s.sw += a; s.sl += b; } });
-      teamB.forEach((n) => { const s = ensure(n); if (s) { s.sw += b; s.sl += a; } });
+      teamA.forEach(n => { const s = ensure(n); if (s){ s.sw += a; s.sl += b; }});
+      teamB.forEach(n => { const s = ensure(n); if (s){ s.sw += b; s.sl += a; }});
 
-      // points
-      if (a > b) teamA.forEach((n) => { const s = ensure(n); if (s) s.points += POINTS_PER_WIN; });
-      else if (b > a) teamB.forEach((n) => { const s = ensure(n); if (s) s.points += POINTS_PER_WIN; });
+      if (a > b) teamA.forEach(n => { const s = ensure(n); if (s) s.points += POINTS_PER_WIN; });
+      else if (b > a) teamB.forEach(n => { const s = ensure(n); if (s) s.points += POINTS_PER_WIN; });
     }
 
     const list = Array.from(stats.values());
-    list.sort((x, y) => {
-      const pd = y.points - x.points;
-      if (pd) return pd;
-      const sd = (y.sw - y.sl) - (x.sw - x.sl);
-      if (sd) return sd;
-      const swd = y.sw - x.sw;
-      if (swd) return swd;
+    list.sort((x,y)=>{
+      const pd = y.points - x.points; if(pd) return pd;
+      const sd = (y.sw - y.sl) - (x.sw - x.sl); if(sd) return sd;
+      const swd = y.sw - x.sw; if(swd) return swd;
       return x.name.localeCompare(y.name);
     });
 
-    return list.map((s, idx) => ({
-      place: idx + 1,
+    return list.map((s, idx)=>({
+      place: idx+1,
       name: s.name,
       points: s.points,
       setsRecord: `${s.sw}-${s.sl}`
@@ -264,29 +248,22 @@
   function renderStandings(tableEl, standings) {
     if (!tableEl) return;
 
-    const headers = ["Place", "Player Name", "Points", "Sets Record"];
-    const thead =
-      `<thead><tr>` +
-      headers.map((h) => `<th>${esc(h.toUpperCase())}</th>`).join("") +
-      `</tr></thead>`;
+    const headers = ["Place","Player Name","Points","Sets Record"];
+    const thead = `<thead><tr>` + headers.map(h=>`<th>${esc(h.toUpperCase())}</th>`).join("") + `</tr></thead>`;
 
-    const tbody =
-      `<tbody>` +
-      standings.map((row) => {
-        const p = String(row.place);
-        const cls =
-          p === "1" ? "posBadge pos1" :
-          p === "2" ? "posBadge pos2" :
-          p === "3" ? "posBadge pos3" : "posBadge";
+    const tbody = `<tbody>` + standings.map(row=>{
+      const p = String(row.place);
+      const cls = p==="1"?"posBadge pos1":p==="2"?"posBadge pos2":p==="3"?"posBadge pos3":"posBadge";
 
-        return `<tr>
-          <td><span class="${cls}">${esc(row.place)}</span></td>
-          <td>${esc(row.name)}</td>
-          <td>${esc(row.points)}</td>
-          <td>${esc(row.setsRecord)}</td>
-        </tr>`;
-      }).join("") +
-      `</tbody>`;
+      const cells = [
+        `<td data-label="PLACE"><span class="${cls}">${esc(row.place)}</span></td>`,
+        `<td data-label="PLAYER NAME">${esc(row.name)}</td>`,
+        `<td data-label="POINTS">${esc(row.points)}</td>`,
+        `<td data-label="SETS RECORD">${esc(row.setsRecord)}</td>`
+      ].join("");
+
+      return `<tr>${cells}</tr>`;
+    }).join("") + `</tbody>`;
 
     tableEl.innerHTML = thead + tbody;
   }
@@ -294,34 +271,29 @@
   function renderRoundsTable(tableEl, headers, rows) {
     if (!tableEl) return;
 
-    // preferred column order if headers exist
-    const order = ["round", "player1", "player2", "vs", "player3", "player4", "score"];
-    const idxMap = new Map(headers.map((h, i) => [normHeader(h), i]));
-    const cols = order.map((k) => ({ k, i: idxMap.get(k) })).filter((c) => Number.isInteger(c.i));
+    const order = ["round","player1","player2","vs","player3","player4","score"];
+    const idxMap = new Map(headers.map((h,i)=>[normHeader(h), i]));
+    const cols = order.map(k=>({k, i: idxMap.get(k)})).filter(c=>Number.isInteger(c.i));
 
-    const useHeaders = cols.length >= 5 ? cols.map((c) => headers[c.i]) : headers;
-    const useIdxs = cols.length >= 5 ? cols.map((c) => c.i) : headers.map((_, i) => i);
+    const useHeaders = cols.length >= 5 ? cols.map(c=>headers[c.i]) : headers;
+    const useIdxs    = cols.length >= 5 ? cols.map(c=>c.i) : headers.map((_,i)=>i);
 
-    const scoreIdx = useHeaders.map(normHeader).findIndex((h) => h === "score");
+    const labels = useHeaders.map(h => String(h ?? "").trim().toUpperCase());
+    const scoreIdx = useHeaders.map(normHeader).findIndex(h=>h==="score");
 
-    const thead =
-      `<thead><tr>` +
-      useHeaders.map((h) => `<th>${esc(String(h ?? "").trim().toUpperCase())}</th>`).join("") +
-      `</tr></thead>`;
-
-    const tbody =
-      `<tbody>` +
-      rows.map((r) => {
-        return `<tr>` + useIdxs.map((srcI, outI) => {
-          const raw = String(r[srcI] ?? "").trim();
-          if (outI === scoreIdx && raw) {
-            const shown = raw.replace(/[–—−־]/g, "-");
-            return `<td class="scoreCell">${esc(shown)}</td>`;
-          }
-          return `<td>${esc(raw)}</td>`;
-        }).join("") + `</tr>`;
-      }).join("") +
-      `</tbody>`;
+    const thead = `<thead><tr>` + useHeaders.map(h=>`<th>${esc(String(h??"").trim().toUpperCase())}</th>`).join("") + `</tr></thead>`;
+    const tbody = `<tbody>` + rows.map(r=>{
+      const tds = useIdxs.map((srcI, outI)=>{
+        const raw = String(r[srcI] ?? "").trim();
+        const label = labels[outI] || "VALUE";
+        if(outI === scoreIdx && raw){
+          const shown = raw.replace(/[–—−־]/g,"-");
+          return `<td data-label="${esc(label)}" class="scoreCell">${esc(shown)}</td>`;
+        }
+        return `<td data-label="${esc(label)}">${esc(raw)}</td>`;
+      }).join("");
+      return `<tr>${tds}</tr>`;
+    }).join("") + `</tbody>`;
 
     tableEl.innerHTML = thead + tbody;
   }
@@ -340,15 +312,15 @@
 
     const set = new Set();
     for (const r of rows) {
-      [iP1, iP2, iP3, iP4].forEach((i) => {
+      [iP1,iP2,iP3,iP4].forEach(i=>{
         const v = String(r[i] ?? "").trim();
         if (v && !isPlaceholderName(v)) set.add(v);
       });
     }
 
-    const list = Array.from(set).sort((a, b) => a.localeCompare(b));
+    const list = Array.from(set).sort((a,b)=>a.localeCompare(b));
 
-    box.innerHTML = list.map((name) => {
+    box.innerHTML = list.map(name=>{
       const img = playerImagePath(name);
       const bio = PLAYER_BIOS[name] || "";
       const init = initials(name);
@@ -383,11 +355,11 @@
   }
 
   function hideAllPanels() {
-    ["panelTable", "panelRounds", "panelPlayers", "panelRules"].forEach((id) => {
+    ["panelTable","panelRounds","panelPlayers","panelRules"].forEach(id=>{
       const el = $(id);
       if (!el) return;
       el.classList.add("isHidden");
-      el.setAttribute("aria-hidden", "true");
+      el.setAttribute("aria-hidden","true");
     });
   }
 
@@ -396,8 +368,8 @@
     const el = $(id);
     if (!el) return;
     el.classList.remove("isHidden");
-    el.setAttribute("aria-hidden", "false");
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    el.setAttribute("aria-hidden","false");
+    el.scrollIntoView({ behavior:"smooth", block:"start" });
   }
 
   async function openTable() {
@@ -432,14 +404,14 @@
     $("btnPlayers")?.addEventListener("click", () => openPlayers().catch(console.error));
     $("btnRules")?.addEventListener("click", () => openRules().catch(console.error));
 
-    document.querySelectorAll("[data-close]").forEach((btn) => {
-      btn.addEventListener("click", () => {
+    document.querySelectorAll("[data-close]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
         hideAllPanels();
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        window.scrollTo({ top:0, behavior:"smooth" });
       });
     });
 
-    loadRounds().catch(() => {});
+    loadRounds().catch(()=>{});
   }
 
   wireUI();
