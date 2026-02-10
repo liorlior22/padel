@@ -319,3 +319,24 @@ body{
   .posBadge{ min-width: 34px; height: 28px; padding: 0 10px; }
   .playerAvatarWrap{ width: 108px; height: 108px; }
 }
+/* ===== MOBILE FIX ===== */
+@media (max-width: 768px){
+  .wrap{padding:12px}
+  .actions{display:grid;grid-template-columns:1fr;gap:10px}
+  .bigBtn{width:100%}
+
+  table{min-width:0;font-size:13px}
+  th,td{padding:8px}
+
+  .playersGrid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:12px
+  }
+
+  .playerCard{padding:12px}
+  .playerBio{font-size:13px;line-height:1.4}
+
+  .leagueTitle{font-size:22px}
+  .leagueSub{font-size:13px}
+}
