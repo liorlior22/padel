@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>C+ Padel League</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <header class="hero">
+    <img class="leagueLogo" src="images/logo.png" alt="C+ League Logo" />
+    <h1 class="leagueTitle">C+ Padel League</h1>
+    <p class="leagueSub">Table · Rounds · The Players · Rules</p>
+  </header>
+
+  <main class="wrap">
+    <div class="actions">
+      <button id="btnTable" class="bigBtn">League Table</button>
+      <button id="btnRounds" class="bigBtn">Rounds</button>
+      <button id="btnPlayers" class="bigBtn">The Players</button>
+      <button id="btnRules" class="bigBtn">Rules</button>
+    </div>
+
+    <div id="status" class="status"></div>
+
+    <!-- TABLE -->
+    <section id="panelTable" class="panel card isHidden" aria-hidden="true">
+      <div class="panelHead">
+        <div class="panelTitleRow">
+          <h2 class="panelTitle">League Table</h2>
+          <button class="closeBtn" data-close>Close</button>
+        </div>
+      </div>
+      <div class="panelBody">
+        <div class="tableWrap">
+          <table id="table" class="dataTable"></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ROUNDS -->
+    <section id="panelRounds" class="panel card isHidden" aria-hidden="true">
+      <div class="panelHead">
+        <div class="panelTitleRow">
+          <h2 class="panelTitle">Rounds</h2>
+          <button class="closeBtn" data-close>Close</button>
+        </div>
+      </div>
+      <div class="panelBody">
+        <div class="tableWrap">
+          <table id="rounds" class="dataTable"></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLAYERS -->
+    <section id="panelPlayers" class="panel card isHidden" aria-hidden="true">
+      <div class="panelHead">
+        <div class="panelTitleRow">
+          <h2 class="panelTitle">The Players</h2>
+          <button class="closeBtn" data-close>Close</button>
+        </div>
+      </div>
+      <div class="panelBody">
+        <div id="playersList" class="playersGrid"></div>
+      </div>
+    </section>
+
+    <!-- RULES -->
+    <section id="panelRules" class="panel card isHidden" aria-hidden="true">
+      <div class="panelHead">
+        <div class="panelTitleRow">
+          <h2 class="panelTitle">Rules</h2>
+          <button class="closeBtn" data-close>Close</button>
+        </div>
+      </div>
+      <div class="panelBody">
+        <div id="rulesBox" class="rulesBox"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="js/app.js" defer></script>
+</body>
+</html>

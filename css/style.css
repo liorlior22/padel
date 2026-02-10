@@ -1,0 +1,312 @@
+:root{
+  /* Bordeaux palette */
+  --bgTop:#6b0f14;
+  --bgMid:#8b1e24;
+  --bgBot:#3f070a;
+
+  --card:#5a0f13cc;
+  --card2:#3a070acc;
+
+  --line:rgba(255,255,255,0.18);
+  --line2:rgba(255,255,255,0.10);
+
+  --white:#ffffff;
+  --textSoft:rgba(255,255,255,0.92);
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color: var(--white);
+  background:
+    radial-gradient(1200px 500px at 50% -10%, rgba(255,255,255,0.10), transparent 60%),
+    linear-gradient(180deg, var(--bgTop) 0%, var(--bgMid) 45%, var(--bgBot) 100%);
+}
+
+/* Layout */
+.wrap{
+  width: min(1120px, 94vw);
+  margin: 0 auto 60px;
+}
+
+.hero{
+  text-align:center;
+  padding: 18px 10px 6px;
+}
+
+.leagueLogo{
+  width: 220px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 999px;
+  border: 10px solid rgba(255,255,255,0.95);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+  background: rgba(0,0,0,0.08);
+  display:block;
+  margin: 8px auto 10px;
+}
+
+.leagueTitle{
+  margin: 0;
+  font-size: 54px;
+  font-weight: 1000;
+  letter-spacing: 0.4px;
+  text-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+.leagueSub{
+  margin: 8px 0 0;
+  color: var(--textSoft);
+  font-weight: 900;
+}
+
+/* Buttons */
+.actions{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px;
+  margin: 18px 0 12px;
+}
+
+.bigBtn{
+  border: none;
+  cursor: pointer;
+  color: var(--white);
+  font-weight: 1000;
+  font-size: 18px;
+  padding: 16px 14px;
+  border-radius: 18px;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.14), rgba(0,0,0,0.12));
+  border: 1px solid rgba(255,255,255,0.20);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+  transition: transform .08s ease, filter .12s ease;
+}
+.bigBtn:hover{ transform: translateY(-1px); filter: brightness(1.04); }
+.bigBtn:active{ transform: translateY(0px); }
+
+.status{
+  min-height: 22px;
+  font-weight: 900;
+  color: var(--textSoft);
+  padding: 2px 2px 10px;
+}
+
+/* Panels / cards */
+.card{
+  background:
+    radial-gradient(900px 320px at 20% 10%, rgba(255,255,255,0.10), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.14));
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 18px;
+  box-shadow: 0 22px 55px rgba(0,0,0,0.26);
+}
+
+.panel{
+  margin-top: 16px;
+  overflow: hidden;
+}
+.isHidden{ display:none; }
+
+.panelHead{
+  padding: 14px 16px 6px;
+}
+.panelTitleRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+}
+.panelTitle{
+  margin:0;
+  font-size: 32px;
+  font-weight: 1000;
+  letter-spacing: .3px;
+}
+
+.closeBtn{
+  border:none;
+  cursor:pointer;
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-weight: 1000;
+  background: rgba(255,255,255,0.92);
+  color: #111;
+  box-shadow: 0 12px 25px rgba(0,0,0,0.18);
+}
+.closeBtn:hover{ filter: brightness(0.97); }
+
+.panelBody{ padding: 10px 14px 18px; }
+
+/* TABLES — strong borders */
+.tableWrap{
+  overflow:auto;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.10);
+}
+
+/* Use border-collapse + explicit borders to show grid */
+.dataTable{
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+
+.dataTable thead th{
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: rgba(0,0,0,0.22);
+  backdrop-filter: blur(8px);
+
+  font-weight: 1000;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+
+  padding: 14px 14px;
+  border-bottom: 2px solid rgba(255,255,255,0.22);
+  border-right: 1px solid var(--line);
+}
+
+.dataTable thead th:last-child{
+  border-right: none;
+}
+
+.dataTable tbody td{
+  padding: 14px 14px;
+  font-weight: 900;
+  color: var(--white);
+
+  border-bottom: 1px solid var(--line2);
+  border-right: 1px solid var(--line2);
+}
+
+.dataTable tbody td:last-child{
+  border-right: none;
+}
+
+/* zebra */
+.dataTable tbody tr:nth-child(odd) td{
+  background: rgba(255,255,255,0.04);
+}
+.dataTable tbody tr:nth-child(even) td{
+  background: rgba(0,0,0,0.06);
+}
+
+.dataTable tbody tr:hover td{
+  background: rgba(255,255,255,0.06);
+}
+
+/* Score cell */
+.scoreCell{
+  font-weight: 1000;
+  white-space: nowrap;
+}
+
+/* Place badges */
+.posBadge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width: 38px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.18);
+  font-weight: 1000;
+}
+
+.pos1{ background: rgba(255,215,0,0.22); border-color: rgba(255,215,0,0.55); }
+.pos2{ background: rgba(192,192,192,0.20); border-color: rgba(192,192,192,0.55); }
+.pos3{ background: rgba(205,127,50,0.20); border-color: rgba(205,127,50,0.55); }
+
+/* Players */
+.playersGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:16px;
+}
+
+.playerCard{
+  border-radius:18px;
+  padding:18px;
+  background:rgba(0,0,0,.12);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);
+  text-align:center;
+}
+
+.playerAvatarWrap{
+  width:120px;
+  height:120px;
+  margin:0 auto 12px;
+  border-radius:999px;
+  border:6px solid rgba(255,255,255,.90);
+  background:rgba(255,255,255,.08);
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+}
+
+.playerAvatar{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.playerFallback{
+  width:100%;
+  height:100%;
+  display:grid;
+  place-items:center;
+  font-size:38px;
+  font-weight:1000;
+  color:#fff;
+  background:rgba(0,0,0,.25);
+}
+
+.playerName{
+  font-size:22px;
+  font-weight:1000;
+  color:#fff;
+  margin-bottom:10px;
+}
+
+.playerBio{
+  direction: rtl;
+  text-align: right;
+  font-size:14px;
+  line-height:1.55;
+  color:rgba(255,255,255,.95);
+  background: rgba(0,0,0,0.10);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+/* Rules */
+.rulesBox{ padding: 6px 2px; }
+.rulesList{
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  list-style: none;
+}
+.rulesList li{
+  direction: rtl;
+  text-align: right;
+  background: rgba(0,0,0,0.10);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 14px;
+  padding: 12px 14px;
+  color: rgba(255,255,255,0.95);
+  font-weight: 1000;
+  line-height: 1.55;
+}

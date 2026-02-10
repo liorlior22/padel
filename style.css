@@ -1,0 +1,13 @@
+cat > css/style.css <<'CSS'
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:#fff;color:#111}
+.wrap{max-width:1100px;margin:0 auto;padding:18px}
+h1{margin:0 0 14px}
+h2{margin:18px 0 8px;font-size:16px}
+.box{border:1px solid #e5e7eb;border-radius:10px;overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:720px}
+th,td{border-bottom:1px solid #e5e7eb;padding:10px;text-align:left;white-space:nowrap}
+thead th{background:#fafafa;font-weight:900}
+tr:last-child td{border-bottom:0}
+.status{margin-top:14px;color:#6b7280;font-weight:700}
+CSS
