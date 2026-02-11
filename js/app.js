@@ -275,7 +275,7 @@
       player4:"PLAYER 4",
       score:"SCORE"
     };
-    return map[k] || "VALUE";
+   
   }
 
   function renderRoundsTable(tableEl, headers, rows) {
