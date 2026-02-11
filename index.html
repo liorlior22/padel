@@ -4,7 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>C+ Padel League</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css?v=11" />
+  <script defer src="js/app.js?v=11"></script>
 </head>
 <body>
 
@@ -16,6 +17,7 @@
 
   <main class="wrap">
     <div class="actions">
+      <button id="btnHome" class="bigBtn">Home</button>
       <button id="btnTable" class="bigBtn">League Table</button>
       <button id="btnRounds" class="bigBtn">Rounds</button>
       <button id="btnPlayers" class="bigBtn">The Players</button>
@@ -24,7 +26,15 @@
 
     <div id="status" class="status"></div>
 
-    <!-- TABLE -->
+    <!-- HOME PANEL -->
+    <section id="panelHome" class="panel card" aria-hidden="false">
+      <div class="homeWelcome">
+        <img class="homeLogo" src="images/logo.png" alt="C+ League Logo" />
+        <h2 class="homeTitle">Welcome to the first<br>C+ Padel League</h2>
+        <p class="homeSubtitle">Experience the excitement of competitive padel!</p>
+      </div>
+    </section>
+
     <section id="panelTable" class="panel card isHidden" aria-hidden="true">
       <div class="panelHead">
         <div class="panelTitleRow">
@@ -39,7 +49,6 @@
       </div>
     </section>
 
-    <!-- ROUNDS -->
     <section id="panelRounds" class="panel card isHidden" aria-hidden="true">
       <div class="panelHead">
         <div class="panelTitleRow">
@@ -54,7 +63,6 @@
       </div>
     </section>
 
-    <!-- PLAYERS -->
     <section id="panelPlayers" class="panel card isHidden" aria-hidden="true">
       <div class="panelHead">
         <div class="panelTitleRow">
@@ -67,7 +75,6 @@
       </div>
     </section>
 
-    <!-- RULES -->
     <section id="panelRules" class="panel card isHidden" aria-hidden="true">
       <div class="panelHead">
         <div class="panelTitleRow">
@@ -82,6 +89,5 @@
 
   </main>
 
-  <script src="js/app.js" defer></script>
 </body>
 </html>
