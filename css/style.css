@@ -138,7 +138,7 @@ body{
 .dataTable{
   width: 100%;
   border-collapse: collapse;
-  min-width: 760px;
+  min-width: 760px; /* desktop table width */
 }
 
 .dataTable thead th{
@@ -262,7 +262,125 @@ body{
   line-height: 1.55;
 }
 
-/* Winner highlight */
+/* ✅ MOBILE: turn tables into cards + scale hero/buttons */
+@media (max-width: 860px){
+  .actions{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .leagueTitle{ font-size: 44px; }
+  .leagueLogo{ width: 190px; height: 190px; }
+  .panelTitle{ font-size: 26px; }
+  .dataTable{ min-width: 0; } /* allow card mode */
+}
+
+@media (max-width: 560px){
+  .wrap{ width: min(560px, 92vw); }
+  .hero{ padding-top: 10px; }
+  .leagueLogo{ width: 160px; height: 160px; border-width: 8px; }
+  .leagueTitle{ font-size: 34px; }
+  .leagueSub{ font-size: 13px; }
+  .actions{ grid-template-columns: 1fr; gap: 10px; }
+  .bigBtn{ font-size: 16px; padding: 14px 12px; border-radius: 16px; }
+
+  /* Card-table mode */
+  .tableWrap{ overflow: visible; background: transparent; border: none; }
+  .dataTable{ border-collapse: separate; border-spacing: 0 10px; }
+  .dataTable thead{ display:none; }
+  .dataTable, .dataTable tbody, .dataTable tr, .dataTable td{ display:block; width:100%; }
+
+  .dataTable tr{
+    background: rgba(0,0,0,0.12);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 16px 35px rgba(0,0,0,0.18);
+  }
+
+  .dataTable tbody td{
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.10);
+    padding: 12px 12px;
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 10px;
+    background: transparent !important;
+  }
+  .dataTable tbody td:last-child{ border-bottom: none; }
+
+  .dataTable tbody td::before{
+    content: attr(data-label);
+    font-weight: 1000;
+    letter-spacing: .3px;
+    opacity: .95;
+    color: rgba(255,255,255,0.92);
+    margin-right: 10px;
+    flex: 0 0 auto;
+  }
+
+  .posBadge{ min-width: 34px; height: 28px; padding: 0 10px; }
+  .playerAvatarWrap{ width: 108px; height: 108px; }
+}
+/* ===== MOBILE FIX ===== */
+@media (max-width: 768px){
+  .wrap{padding:12px}
+  .actions{display:grid;grid-template-columns:1fr;gap:10px}
+  .bigBtn{width:100%}
+
+  table{min-width:0;font-size:13px}
+  th,td{padding:8px}
+
+  .playersGrid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:12px
+  }
+
+  .playerCard{padding:12px}
+  .playerBio{font-size:13px;line-height:1.4}
+
+  .leagueTitle{font-size:22px}
+  .leagueSub{font-size:13px}
+}
+@media (max-width: 720px){
+  .wrap{padding:12px}
+  .panel{padding:12px}
+  .panelTitle{font-size:26px}
+  .closeBtn{padding:8px 12px;font-size:14px}
+
+  /* אם יש גלילה/חיתוך */
+  .tableWrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+  table{min-width:0 !important}
+  td{white-space:normal !important; word-break:break-word}
+}
+/* MOBILE: tables become cards */
+@media (max-width: 720px){
+  .tableWrap{overflow:visible}
+  .dataTable{width:100%}
+
+  /* להפוך את הטבלה לכרטיסים */
+  .dataTable thead{display:none}
+  .dataTable, .dataTable tbody, .dataTable tr{display:block;width:100%}
+  .dataTable tr{
+    border-top:1px solid rgba(255,255,255,.12);
+    padding:6px 0;
+  }
+
+  .dataTable td{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    padding:10px 12px;
+    white-space:normal;      /* חשוב */
+    word-break:break-word;   /* חשוב */
+  }
+
+  .dataTable td::before{
+    content:attr(data-label);
+    font-weight:900;
+    opacity:.85;
+  }
+}
+/* winner highlight */
 .winCell{
   font-weight: 900;
   box-shadow: inset 0 0 0 9999px rgba(255, 215, 0, 0.08);
@@ -270,205 +388,47 @@ body{
 .rowAWin td, .rowBWin td{
   border-bottom-color: rgba(255,255,255,.14);
 }
-
-/* ========== RESPONSIVE DESIGN ========== */
-
-/* Tablet */
-@media (max-width: 860px){
-  .actions{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .leagueTitle{ font-size: 44px; }
-  .leagueLogo{ width: 190px; height: 190px; }
-  .panelTitle{ font-size: 28px; }
+/* winner highlight */
+.winCell{
+  font-weight: 900;
+  box-shadow: inset 0 0 0 9999px rgba(255, 215, 0, 0.08);
 }
-
-/* Mobile - כאן מתחיל התיקון העיקרי */
-@media (max-width: 720px){
-  .wrap{ 
-    width: 96vw;
-    padding: 8px;
-  }
-  
-  .hero{ padding: 10px 8px 6px; }
-  
-  .leagueLogo{ 
-    width: 150px; 
-    height: 150px; 
-    border-width: 8px; 
-  }
-  
-  .leagueTitle{ 
-    font-size: 28px;
-    letter-spacing: 0.2px;
-  }
-  
-  .leagueSub{ 
-    font-size: 13px;
-    margin-top: 6px;
-  }
-  
-  .actions{ 
-    grid-template-columns: 1fr; 
-    gap: 10px;
-    margin: 14px 0 8px;
-  }
-  
-  .bigBtn{ 
-    font-size: 15px; 
-    padding: 13px 12px; 
-    border-radius: 14px;
-  }
-  
-  .panel{ 
-    margin-top: 12px;
-  }
-  
-  .panelHead{ 
-    padding: 12px 12px 6px; 
-  }
-  
-  .panelTitle{ 
-    font-size: 22px;
-  }
-  
-  .closeBtn{ 
-    padding: 8px 12px;
-    font-size: 13px;
-    border-radius: 12px;
-  }
-  
-  .panelBody{ 
-    padding: 8px 8px 14px; 
-  }
-
-  /* טבלאות הופכות לכרטיסים במובייל */
-  .tableWrap{ 
-    overflow: visible; 
-    background: transparent; 
-    border: none;
-    border-radius: 0;
-  }
-  
-  .dataTable{ 
-    width: 100%;
-    min-width: 0;
-    border-collapse: separate; 
-    border-spacing: 0 12px;
-  }
-  
-  .dataTable thead{ 
-    display: none; 
-  }
-  
-  .dataTable, 
-  .dataTable tbody, 
-  .dataTable tr, 
-  .dataTable td{ 
-    display: block; 
-    width: 100%; 
-  }
-
-  .dataTable tr{
-    background: rgba(0,0,0,0.15);
+.rowAWin td, .rowBWin td{
+  border-bottom-color: rgba(255,255,255,.14);
+}
+/* ===== MOBILE PATCH (keep original style, just fit table on phones) ===== */
+@media (max-width: 560px){
+  /* תשאיר טבלה רגילה (לא כרטיסים) */
+  .tableWrap{
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    background: rgba(0,0,0,0.10);
     border: 1px solid rgba(255,255,255,0.18);
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.20);
-    margin-bottom: 2px;
   }
 
+  .dataTable{
+    min-width: 0;          /* מבטל את ה-760 במובייל */
+    width: 100%;
+    table-layout: fixed;   /* מחלק רוחב שווה, לא בורח */
+  }
+
+  .dataTable thead{ display: table-header-group; } /* מחזיר כותרות */
+  .dataTable thead th,
   .dataTable tbody td{
-    border: none;
-    border-bottom: 1px solid rgba(255,255,255,0.12);
-    padding: 11px 13px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    background: transparent !important;
-    white-space: normal;
+    white-space: normal;        /* מאפשר שבירת שורה */
     word-break: break-word;
-    font-size: 14px;
-  }
-  
-  .dataTable tbody td:last-child{ 
-    border-bottom: none; 
+    font-size: clamp(11px, 3.2vw, 13px);  /* זה הקסם: “מקטין לבד” */
+    padding: 10px 10px;
   }
 
-  .dataTable tbody td::before{
-    content: attr(data-label);
-    font-weight: 1000;
-    letter-spacing: .4px;
-    opacity: .95;
-    color: rgba(255,255,255,0.92);
-    flex-shrink: 0;
-    font-size: 13px;
-  }
-
-  .posBadge{ 
-    min-width: 32px; 
-    height: 26px; 
-    padding: 0 10px;
-    font-size: 13px;
-  }
-  
-  .scoreCell{
-    white-space: normal;
-    text-align: left;
-  }
-
-  /* Players Grid */
-  .playersGrid{
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .playerCard{ 
-    padding: 14px; 
-  }
-  
-  .playerAvatarWrap{ 
-    width: 100px; 
-    height: 100px;
-    border-width: 5px;
-  }
-  
-  .playerName{
-    font-size: 19px;
-  }
-  
-  .playerBio{ 
-    font-size: 13px; 
-    line-height: 1.5;
-    padding: 10px 12px;
-  }
-
-  .rulesList li{
-    font-size: 14px;
-    padding: 10px 12px;
-  }
+  .scoreCell{ white-space: nowrap; } /* ציונים לא נשברים */
 }
 
-/* Very small phones */
-@media (max-width: 400px){
-  .leagueTitle{ 
-    font-size: 24px;
-  }
-  
-  .leagueLogo{ 
-    width: 130px; 
-    height: 130px; 
-  }
-  
-  .panelTitle{ 
-    font-size: 20px;
-  }
-  
+/* עוד טיפה התאמה למסכים ממש צרים */
+@media (max-width: 390px){
+  .dataTable thead th,
   .dataTable tbody td{
-    font-size: 13px;
-    padding: 10px 11px;
-  }
-  
-  .dataTable tbody td::before{
-    font-size: 12px;
+    font-size: 11px;
+    padding: 9px 8px;
   }
 }
