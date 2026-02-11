@@ -388,3 +388,11 @@ body{
 .rowAWin td, .rowBWin td{
   border-bottom-color: rgba(255,255,255,.14);
 }
+/* winner highlight */
+.winCell{
+  font-weight: 900;
+  box-shadow: inset 0 0 0 9999px rgba(255, 215, 0, 0.08);
+}
+.rowAWin td, .rowBWin td{
+  border-bottom-color: rgba(255,255,255,.14);
+}

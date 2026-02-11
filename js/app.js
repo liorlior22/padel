@@ -285,55 +285,44 @@
     score:"SCORE",
     value:""
   };
-
   const labels = useKeys.map(k => (labelMap[k] ?? "").toUpperCase());
-  const idxRound  = useKeys.indexOf("round");
-  const idxP1     = useKeys.indexOf("player1");
-  const idxP2     = useKeys.indexOf("player2");
-  const idxVS     = useKeys.indexOf("vs");
-  const idxP3     = useKeys.indexOf("player3");
-  const idxP4     = useKeys.indexOf("player4");
-  const idxScore  = useKeys.indexOf("score");
 
-const parseScore = (s) => {
-  const t = String(s ?? "").trim();
-  if (!t) return null;
-  const clean = t
-    .replace(/[–—−־]/g, "-")
-    .replaceAll(":", "-");        // <<< זה החסר אצלך
-  const m = clean.match(/^(\d+)\s*-\s*(\d+)$/);
-  if (!m) return null;
-  return { a: Number(m[1]), b: Number(m[2]) };
-};
+  const parseScoreLocal = (s) => {
+    const t = String(s ?? "").trim();
+    if (!t) return null;
+    const clean = t.replace(/[–—−־]/g, "-").replaceAll(":", "-");
+    const m = clean.match(/^(\d+)\s*-\s*(\d+)$/);
+    if (!m) return null;
+    return { a: Number(m[1]), b: Number(m[2]) };
+  };
 
+  const idxScore = useKeys.indexOf("score");
 
   const thead = `<thead><tr>` + labels.map(h=>`<th>${esc(h || "")}</th>`).join("") + `</tr></thead>`;
-
   const tbody = `<tbody>` + rows.map(r=>{
-    const sc = (idxScore >= 0) ? parseScore(r[useIdxs[idxScore]] ?? "") : null;
-    const aWin = sc && sc.a > sc.b;
-    const bWin = sc && sc.b > sc.a;
+    const sc = (idxScore >= 0) ? parseScoreLocal(r[useIdxs[idxScore]] ?? "") : null;
+    const aWin = sc && sc.a > sc.b; // Team A: player1+player2
+    const bWin = sc && sc.b > sc.a; // Team B: player3+player4
 
     const tds = useIdxs.map((srcI, outI)=>{
       const key = useKeys[outI] || "value";
       const raw = String(r[srcI] ?? "").trim();
-      const label = labels[outI] || "";
 
-      // Mark winners (Team A = player1+player2, Team B = player3+player4)
       let cls = "";
       let prefix = "";
       if (aWin && (key === "player1" || key === "player2")) { cls = "winCell"; prefix = "🏆 "; }
       if (bWin && (key === "player3" || key === "player4")) { cls = "winCell"; prefix = "🏆 "; }
 
       const shown = (key === "score" && raw) ? raw.replace(/[–—−־]/g,"-") : raw;
-      return `<td data-label="${esc(label)}" class="${cls}">${esc(prefix + shown)}</td>`;
+      return `<td data-label="${esc(labels[outI] || "")}" class="${cls}">${esc(prefix + shown)}</td>`;
     }).join("");
 
-    return `<tr class="${aWin ? "rowAWin" : bWin ? "rowBWin" : ""}">${tds}</tr>`;
+    return `<tr>${tds}</tr>`;
   }).join("") + `</tbody>`;
 
   tableEl.innerHTML = thead + tbody;
 }
+
 
 
   function buildPlayersFromRounds(rounds) {
