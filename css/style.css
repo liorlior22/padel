@@ -352,3 +352,31 @@ body{
   table{min-width:0 !important}
   td{white-space:normal !important; word-break:break-word}
 }
+/* MOBILE: tables become cards */
+@media (max-width: 720px){
+  .tableWrap{overflow:visible}
+  .dataTable{width:100%}
+
+  /* להפוך את הטבלה לכרטיסים */
+  .dataTable thead{display:none}
+  .dataTable, .dataTable tbody, .dataTable tr{display:block;width:100%}
+  .dataTable tr{
+    border-top:1px solid rgba(255,255,255,.12);
+    padding:6px 0;
+  }
+
+  .dataTable td{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    padding:10px 12px;
+    white-space:normal;      /* חשוב */
+    word-break:break-word;   /* חשוב */
+  }
+
+  .dataTable td::before{
+    content:attr(data-label);
+    font-weight:900;
+    opacity:.85;
+  }
+}

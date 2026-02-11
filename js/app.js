@@ -265,56 +265,44 @@
     tableEl.innerHTML = thead + tbody;
   }
 
- function defaultLabelForKey(k){
-  const map = {
+ function renderRoundsTable(tableEl, headers, rows) {
+  if (!tableEl) return;
+
+  const order = ["round","player1","player2","vs","player3","player4","score"];
+  const idxMap = new Map(headers.map((h,i)=>[normHeader(h), i]));
+  const cols = order.map(k=>({k, i: idxMap.get(k)})).filter(c=>Number.isInteger(c.i));
+
+  // fallback אם הכותרות לא מזוהות
+  const useIdxs = cols.length ? cols.map(c=>c.i) : headers.map((_,i)=>i);
+  const useKeys = cols.length ? cols.map(c=>c.k) : headers.map(h=>normHeader(h) || "value");
+
+  const labelMap = {
     round:"ROUND",
     player1:"PLAYER 1",
     player2:"PLAYER 2",
     vs:"VS",
     player3:"PLAYER 3",
     player4:"PLAYER 4",
-    score:"SCORE"
+    score:"SCORE",
+    value:""
   };
-  return map[k] || "VALUE";
+
+  const labels = useKeys.map(k => (labelMap[k] ?? "").toUpperCase());
+  const scoreIdx = useKeys.findIndex(k => k === "score");
+
+  const thead = `<thead><tr>` + labels.map(h=>`<th>${esc(h || "")}</th>`).join("") + `</tr></thead>`;
+  const tbody = `<tbody>` + rows.map(r=>{
+    const tds = useIdxs.map((srcI, outI)=>{
+      const raw = String(r[srcI] ?? "").trim();
+      const shown = (outI === scoreIdx && raw) ? raw.replace(/[–—−־]/g,"-") : raw;
+      const label = labels[outI] || ""; // אין VALUE יותר
+      return `<td data-label="${esc(label)}">${esc(shown)}</td>`;
+    }).join("");
+    return `<tr>${tds}</tr>`;
+  }).join("") + `</tbody>`;
+
+  tableEl.innerHTML = thead + tbody;
 }
-
-
-  function renderRoundsTable(tableEl, headers, rows) {
-    if (!tableEl) return;
-
-    const order = ["round","player1","player2","vs","player3","player4","score"];
-    const idxMap = new Map(headers.map((h,i)=>[normHeader(h), i]));
-    const cols = order.map(k=>({k, i: idxMap.get(k)})).filter(c=>Number.isInteger(c.i));
-
-    const useHeaders = cols.length >= 5 ? cols.map(c=>headers[c.i]) : headers;
-    const useIdxs    = cols.length >= 5 ? cols.map(c=>c.i) : headers.map((_,i)=>i);
-    const useKeys    = cols.length >= 5 ? cols.map(c=>c.k) : useHeaders.map(h=>normHeader(h) || "value");
-
-    // FIX: no more VALUE spam when sheet headers are empty
-    const labels = useHeaders.map((h, idx) => {
-      const t = String(h ?? "").trim();
-      if (t) return t.toUpperCase();
-      return defaultLabelForKey(useKeys[idx]);
-    });
-
-    const scoreIdx = useKeys.findIndex(k => k === "score");
-
-    const thead = `<thead><tr>` + labels.map(h=>`<th>${esc(h)}</th>`).join("") + `</tr></thead>`;
-    const tbody = `<tbody>` + rows.map(r=>{
-      const tds = useIdxs.map((srcI, outI)=>{
-        const raw = String(r[srcI] ?? "").trim();
-        const label = labels[outI] || "VALUE";
-        if(outI === scoreIdx && raw){
-          const shown = raw.replace(/[–—−־]/g,"-");
-          return `<td data-label="${esc(label)}">${esc(shown)}</td>`;
-        }
-        return `<td data-label="${esc(label)}">${esc(raw)}</td>`;
-      }).join("");
-      return `<tr>${tds}</tr>`;
-    }).join("") + `</tbody>`;
-
-    tableEl.innerHTML = thead + tbody;
-  }
 
   function buildPlayersFromRounds(rounds) {
     const box = $("playersList");
