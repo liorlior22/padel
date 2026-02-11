@@ -1,3 +1,4 @@
+// js/app.js
 (() => {
   "use strict";
 
@@ -252,20 +253,29 @@
     const thead = `<thead><tr>` + headers.map(h=>`<th>${esc(h.toUpperCase())}</th>`).join("") + `</tr></thead>`;
 
     const tbody = `<tbody>` + standings.map(row=>{
-      const p = String(row.place);
-      const cls = p==="1"?"posBadge pos1":p==="2"?"posBadge pos2":p==="3"?"posBadge pos3":"posBadge";
-
       const cells = [
-        `<td data-label="PLACE"><span class="${cls}">${esc(row.place)}</span></td>`,
+        `<td data-label="PLACE">${esc(row.place)}</td>`,
         `<td data-label="PLAYER NAME">${esc(row.name)}</td>`,
         `<td data-label="POINTS">${esc(row.points)}</td>`,
         `<td data-label="SETS RECORD">${esc(row.setsRecord)}</td>`
       ].join("");
-
       return `<tr>${cells}</tr>`;
     }).join("") + `</tbody>`;
 
     tableEl.innerHTML = thead + tbody;
+  }
+
+  function defaultLabelForKey(k){
+    const map = {
+      round:"ROUND",
+      player1:"PLAYER 1",
+      player2:"PLAYER 2",
+      vs:"VS",
+      player3:"PLAYER 3",
+      player4:"PLAYER 4",
+      score:"SCORE"
+    };
+    return map[k] || "VALUE";
   }
 
   function renderRoundsTable(tableEl, headers, rows) {
@@ -277,18 +287,25 @@
 
     const useHeaders = cols.length >= 5 ? cols.map(c=>headers[c.i]) : headers;
     const useIdxs    = cols.length >= 5 ? cols.map(c=>c.i) : headers.map((_,i)=>i);
+    const useKeys    = cols.length >= 5 ? cols.map(c=>c.k) : useHeaders.map(h=>normHeader(h) || "value");
 
-    const labels = useHeaders.map(h => String(h ?? "").trim().toUpperCase());
-    const scoreIdx = useHeaders.map(normHeader).findIndex(h=>h==="score");
+    // FIX: no more VALUE spam when sheet headers are empty
+    const labels = useHeaders.map((h, idx) => {
+      const t = String(h ?? "").trim();
+      if (t) return t.toUpperCase();
+      return defaultLabelForKey(useKeys[idx]);
+    });
 
-    const thead = `<thead><tr>` + useHeaders.map(h=>`<th>${esc(String(h??"").trim().toUpperCase())}</th>`).join("") + `</tr></thead>`;
+    const scoreIdx = useKeys.findIndex(k => k === "score");
+
+    const thead = `<thead><tr>` + labels.map(h=>`<th>${esc(h)}</th>`).join("") + `</tr></thead>`;
     const tbody = `<tbody>` + rows.map(r=>{
       const tds = useIdxs.map((srcI, outI)=>{
         const raw = String(r[srcI] ?? "").trim();
         const label = labels[outI] || "VALUE";
         if(outI === scoreIdx && raw){
           const shown = raw.replace(/[–—−־]/g,"-");
-          return `<td data-label="${esc(label)}" class="scoreCell">${esc(shown)}</td>`;
+          return `<td data-label="${esc(label)}">${esc(shown)}</td>`;
         }
         return `<td data-label="${esc(label)}">${esc(raw)}</td>`;
       }).join("");
