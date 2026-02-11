@@ -340,3 +340,15 @@ body{
   .leagueTitle{font-size:22px}
   .leagueSub{font-size:13px}
 }
+@media (max-width: 720px){
+  .wrap{padding:12px}
+  .panel{padding:12px}
+  .panelTitle{font-size:26px}
+  .closeBtn{padding:8px 12px;font-size:14px}
+
+  /* אם יש גלילה/חיתוך */
+  .tableWrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+  table{min-width:0 !important}
+  td{white-space:normal !important; word-break:break-word}
+}
