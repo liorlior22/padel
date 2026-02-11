@@ -265,27 +265,46 @@
     tableEl.innerHTML = thead + tbody;
   }
 
- function renderRoundsTable(tableEl, headers, rows) {
+function renderRoundsTable(tableEl, headers, rows) {
   if (!tableEl) return;
 
-  const order = ["round","player1","player2","vs","player3","player4","score"];
   const idxMap = new Map(headers.map((h,i)=>[normHeader(h), i]));
-  const cols = order.map(k=>({k, i: idxMap.get(k)})).filter(c=>Number.isInteger(c.i));
 
-  const useIdxs = cols.length ? cols.map(c=>c.i) : headers.map((_,i)=>i);
-  const useKeys = cols.length ? cols.map(c=>c.k) : headers.map(h=>normHeader(h) || "value");
+  // allow score column named "score" OR "result"
+  const scoreColIndex = idxMap.get("score") ?? idxMap.get("result");
 
-  const labelMap = {
-    round:"ROUNDS",
-    player1:"PLAYER 1",
-    player2:"PLAYER 2",
-    vs:"VS",
-    player3:"PLAYER 1",
-    player4:"PLAYER 2",
-    score:"SCORE",
-    value:""
+  // build columns (prefer ordered known columns if exist)
+  const pick = (key, fallbacks=[]) => {
+    const i = idxMap.get(key);
+    if (Number.isInteger(i)) return i;
+    for (const f of fallbacks) {
+      const j = idxMap.get(f);
+      if (Number.isInteger(j)) return j;
+    }
+    return null;
   };
-  const labels = useKeys.map(k => (labelMap[k] ?? "").toUpperCase());
+
+  const colRound = pick("round", ["rounds"]);
+  const colP1    = pick("player1", ["player 1","p1"]);
+  const colP2    = pick("player2", ["player 2","p2"]);
+  const colVS    = pick("vs", []);
+  const colP3    = pick("player3", ["player 3","p3"]);
+  const colP4    = pick("player4", ["player 4","p4"]);
+  const colScore = Number.isInteger(scoreColIndex) ? scoreColIndex : null;
+
+  const cols = [
+    {k:"round",  i:colRound,  label:"ROUNDS"},
+    {k:"player1",i:colP1,     label:"PLAYER 1"},
+    {k:"player2",i:colP2,     label:"PLAYER 2"},
+    {k:"vs",     i:colVS,     label:"VS"},
+    {k:"player3",i:colP3,     label:"PLAYER 1"},
+    {k:"player4",i:colP4,     label:"PLAYER 2"},
+    {k:"score",  i:colScore,  label:"SCORE"},
+  ].filter(c => Number.isInteger(c.i));
+
+  // fallback: if nothing detected, render raw
+  const use = cols.length ? cols : headers.map((h,i)=>({k:"value", i, label: String(h||"").toUpperCase()}));
+  const idxScoreOut = use.findIndex(c => c.k === "score");
 
   const parseScoreLocal = (s) => {
     const t = String(s ?? "").trim();
@@ -296,29 +315,33 @@
     return { a: Number(m[1]), b: Number(m[2]) };
   };
 
-  const idxScore = useKeys.indexOf("score");
+  const thead =
+    `<thead><tr>` +
+    use.map(c => `<th>${esc(c.label || "")}</th>`).join("") +
+    `</tr></thead>`;
 
-  const thead = `<thead><tr>` + labels.map(h=>`<th>${esc(h || "")}</th>`).join("") + `</tr></thead>`;
-  const tbody = `<tbody>` + rows.map(r=>{
-    const sc = (idxScore >= 0) ? parseScoreLocal(r[useIdxs[idxScore]] ?? "") : null;
-    const aWin = sc && sc.a > sc.b; // Team A: player1+player2
-    const bWin = sc && sc.b > sc.a; // Team B: player3+player4
+  const tbody =
+    `<tbody>` +
+    rows.map(r => {
+      const sc = (idxScoreOut >= 0) ? parseScoreLocal(r[use[idxScoreOut].i] ?? "") : null;
+      const aWin = sc && sc.a > sc.b;
+      const bWin = sc && sc.b > sc.a;
 
-    const tds = useIdxs.map((srcI, outI)=>{
-      const key = useKeys[outI] || "value";
-      const raw = String(r[srcI] ?? "").trim();
+      const tds = use.map(c => {
+        const raw = String(r[c.i] ?? "").trim();
+        const shown = (c.k === "score" && raw) ? raw.replace(/[–—−־]/g,"-") : raw;
 
-      let cls = "";
-      let prefix = "";
-      if (aWin && (key === "player1" || key === "player2")) { cls = "winCell"; prefix = "🏆 "; }
-      if (bWin && (key === "player3" || key === "player4")) { cls = "winCell"; prefix = "🏆 "; }
+        let cls = "";
+        let prefix = "";
+        if (aWin && (c.k === "player1" || c.k === "player2")) { cls = "winCell"; prefix = "🏆 "; }
+        if (bWin && (c.k === "player3" || c.k === "player4")) { cls = "winCell"; prefix = "🏆 "; }
 
-      const shown = (key === "score" && raw) ? raw.replace(/[–—−־]/g,"-") : raw;
-      return `<td data-label="${esc(labels[outI] || "")}" class="${cls}">${esc(prefix + shown)}</td>`;
-    }).join("");
+        return `<td data-label="${esc(c.label || "")}" class="${cls}">${esc(prefix + shown)}</td>`;
+      }).join("");
 
-    return `<tr>${tds}</tr>`;
-  }).join("") + `</tbody>`;
+      return `<tr>${tds}</tr>`;
+    }).join("") +
+    `</tbody>`;
 
   tableEl.innerHTML = thead + tbody;
 }
