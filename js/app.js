@@ -295,14 +295,17 @@
   const idxP4     = useKeys.indexOf("player4");
   const idxScore  = useKeys.indexOf("score");
 
-  const parseScore = (s) => {
-    const t = String(s ?? "").trim();
-    if (!t) return null;
-    const clean = t.replace(/[–—−־]/g, "-").replaceAll(":", "-");
-    const m = clean.match(/^(\d+)\s*-\s*(\d+)$/);
-    if (!m) return null;
-    return { a: Number(m[1]), b: Number(m[2]) };
-  };
+const parseScore = (s) => {
+  const t = String(s ?? "").trim();
+  if (!t) return null;
+  const clean = t
+    .replace(/[–—−־]/g, "-")
+    .replaceAll(":", "-");        // <<< זה החסר אצלך
+  const m = clean.match(/^(\d+)\s*-\s*(\d+)$/);
+  if (!m) return null;
+  return { a: Number(m[1]), b: Number(m[2]) };
+};
+
 
   const thead = `<thead><tr>` + labels.map(h=>`<th>${esc(h || "")}</th>`).join("") + `</tr></thead>`;
 
