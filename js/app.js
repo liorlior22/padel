@@ -265,18 +265,19 @@
     tableEl.innerHTML = thead + tbody;
   }
 
-  function defaultLabelForKey(k){
-    const map = {
-      round:"ROUND",
-      player1:"PLAYER 1",
-      player2:"PLAYER 2",
-      vs:"VS",
-      player3:"PLAYER 3",
-      player4:"PLAYER 4",
-      score:"SCORE"
-    };
-   
-  }
+ function defaultLabelForKey(k){
+  const map = {
+    round:"ROUND",
+    player1:"PLAYER 1",
+    player2:"PLAYER 2",
+    vs:"VS",
+    player3:"PLAYER 3",
+    player4:"PLAYER 4",
+    score:"SCORE"
+  };
+  return map[k] || "VALUE";
+}
+
 
   function renderRoundsTable(tableEl, headers, rows) {
     if (!tableEl) return;
