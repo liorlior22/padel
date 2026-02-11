@@ -8,6 +8,7 @@
 
   --white:#ffffff;
   --textSoft:rgba(255,255,255,0.92);
+  --gold:rgba(255,215,0,0.95);
 }
 
 *{ box-sizing:border-box; }
@@ -58,10 +59,51 @@ body{
   font-weight: 900;
 }
 
+/* HOME PANEL */
+.homeWelcome{
+  text-align: center;
+  padding: 60px 20px 80px;
+}
+
+.homeLogo{
+  width: 320px;
+  height: 320px;
+  object-fit: cover;
+  border-radius: 999px;
+  border: 12px solid rgba(255,255,255,0.95);
+  box-shadow: 0 25px 70px rgba(0,0,0,0.40);
+  background: rgba(0,0,0,0.08);
+  display: block;
+  margin: 0 auto 30px;
+  animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.homeTitle{
+  margin: 0 0 16px;
+  font-size: 48px;
+  font-weight: 1000;
+  letter-spacing: 0.5px;
+  text-shadow: 0 12px 35px rgba(0,0,0,0.40);
+  line-height: 1.2;
+}
+
+.homeSubtitle{
+  margin: 0;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--textSoft);
+  text-shadow: 0 8px 20px rgba(0,0,0,0.30);
+}
+
 /* Buttons */
 .actions{
   display:grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 14px;
   margin: 18px 0 10px;
 }
@@ -170,6 +212,15 @@ body{
 
 .scoreCell{ font-weight: 1000; white-space: nowrap; }
 
+/* Winner highlight - Gold styling */
+.winCell{
+  font-weight: 1000;
+  background: linear-gradient(135deg, rgba(255,215,0,0.18), rgba(255,215,0,0.08)) !important;
+  border-left: 3px solid var(--gold) !important;
+  box-shadow: inset 0 0 20px rgba(255,215,0,0.12);
+  color: rgba(255,235,100,0.98) !important;
+}
+
 /* Place badges */
 .posBadge{
   display:inline-flex;
@@ -262,23 +313,16 @@ body{
   line-height: 1.55;
 }
 
-/* Winner highlight */
-.winCell{
-  font-weight: 900;
-  box-shadow: inset 0 0 0 9999px rgba(255, 215, 0, 0.08);
-}
-.rowAWin td, .rowBWin td{
-  border-bottom-color: rgba(255,255,255,.14);
-}
-
 /* ========== RESPONSIVE DESIGN ========== */
 
 /* Tablet */
 @media (max-width: 860px){
-  .actions{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .actions{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .leagueTitle{ font-size: 44px; }
   .leagueLogo{ width: 190px; height: 190px; }
   .panelTitle{ font-size: 28px; }
+  .homeTitle{ font-size: 38px; }
+  .homeLogo{ width: 260px; height: 260px; }
 }
 
 /* Mobile - טבלה קומפקטית */
@@ -305,9 +349,30 @@ body{
     font-size: 12px;
     margin-top: 5px;
   }
+
+  /* HOME PANEL MOBILE */
+  .homeWelcome{
+    padding: 30px 15px 40px;
+  }
+
+  .homeLogo{
+    width: 200px;
+    height: 200px;
+    border-width: 8px;
+    margin-bottom: 20px;
+  }
+
+  .homeTitle{
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+
+  .homeSubtitle{
+    font-size: 16px;
+  }
   
   .actions{ 
-    grid-template-columns: 1fr; 
+    grid-template-columns: 1fr 1fr; 
     gap: 9px;
     margin: 12px 0 8px;
   }
@@ -366,6 +431,10 @@ body{
     font-size: 11px;
     font-weight: 800;
   }
+
+  .winCell{
+    border-left-width: 2px !important;
+  }
   
   .scoreCell{
     white-space: nowrap;
@@ -420,6 +489,19 @@ body{
   .leagueLogo{ 
     width: 120px; 
     height: 120px; 
+  }
+
+  .homeLogo{
+    width: 170px;
+    height: 170px;
+  }
+
+  .homeTitle{
+    font-size: 24px;
+  }
+
+  .homeSubtitle{
+    font-size: 14px;
   }
   
   .panelTitle{ 

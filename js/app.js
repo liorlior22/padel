@@ -270,10 +270,8 @@ function renderRoundsTable(tableEl, headers, rows) {
 
   const idxMap = new Map(headers.map((h,i)=>[normHeader(h), i]));
 
-  // allow score column named "score" OR "result"
   const scoreColIndex = idxMap.get("score") ?? idxMap.get("result");
 
-  // build columns (prefer ordered known columns if exist)
   const pick = (key, fallbacks=[]) => {
     const i = idxMap.get(key);
     if (Number.isInteger(i)) return i;
@@ -302,7 +300,6 @@ function renderRoundsTable(tableEl, headers, rows) {
     {k:"score",  i:colScore,  label:"SCORE"},
   ].filter(c => Number.isInteger(c.i));
 
-  // fallback: if nothing detected, render raw
   const use = cols.length ? cols : headers.map((h,i)=>({k:"value", i, label: String(h||"").toUpperCase()}));
   const idxScoreOut = use.findIndex(c => c.k === "score");
 
@@ -333,8 +330,16 @@ function renderRoundsTable(tableEl, headers, rows) {
 
         let cls = "";
         let prefix = "";
-        if (aWin && (c.k === "player1" || c.k === "player2")) { cls = "winCell"; prefix = "🏆 "; }
-        if (bWin && (c.k === "player3" || c.k === "player4")) { cls = "winCell"; prefix = "🏆 "; }
+        
+        // 🏆 Gold highlight for winners
+        if (aWin && (c.k === "player1" || c.k === "player2")) { 
+          cls = "winCell"; 
+          prefix = "🏆 "; 
+        }
+        if (bWin && (c.k === "player3" || c.k === "player4")) { 
+          cls = "winCell"; 
+          prefix = "🏆 "; 
+        }
 
         return `<td data-label="${esc(c.label || "")}" class="${cls}">${esc(prefix + shown)}</td>`;
       }).join("");
@@ -405,7 +410,7 @@ function renderRoundsTable(tableEl, headers, rows) {
   }
 
   function hideAllPanels() {
-    ["panelTable","panelRounds","panelPlayers","panelRules"].forEach(id=>{
+    ["panelHome","panelTable","panelRounds","panelPlayers","panelRules"].forEach(id=>{
       const el = $(id);
       if (!el) return;
       el.classList.add("isHidden");
@@ -420,6 +425,10 @@ function renderRoundsTable(tableEl, headers, rows) {
     el.classList.remove("isHidden");
     el.setAttribute("aria-hidden","false");
     el.scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  function openHome() {
+    showPanel("panelHome");
   }
 
   async function openTable() {
@@ -447,8 +456,10 @@ function renderRoundsTable(tableEl, headers, rows) {
   }
 
   function wireUI() {
-    hideAllPanels();
+    // Show HOME panel by default
+    showPanel("panelHome");
 
+    $("btnHome")?.addEventListener("click", () => openHome());
     $("btnTable")?.addEventListener("click", () => openTable().catch(console.error));
     $("btnRounds")?.addEventListener("click", () => openRounds().catch(console.error));
     $("btnPlayers")?.addEventListener("click", () => openPlayers().catch(console.error));
@@ -456,7 +467,7 @@ function renderRoundsTable(tableEl, headers, rows) {
 
     document.querySelectorAll("[data-close]").forEach(btn=>{
       btn.addEventListener("click", ()=>{
-        hideAllPanels();
+        openHome();
         window.scrollTo({ top:0, behavior:"smooth" });
       });
     });
