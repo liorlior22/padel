@@ -327,7 +327,7 @@ body{
   .homeLogo{ width: 260px; height: 260px; }
 }
 
-/* Mobile - טבלה קומפקטית */
+/* Mobile - ×˜×‘×œ×” ×§×•×ž×¤×§×˜×™×ª */
 @media (max-width: 720px){
   .wrap{ 
     width: 98vw;
@@ -407,7 +407,7 @@ body{
     padding: 6px 6px 12px; 
   }
 
-  /* טבלה קומפקטית - הכל נראה בתצוגה */
+  /* ×˜×‘×œ×” ×§×•×ž×¤×§×˜×™×ª - ×”×›×œ × ×¨××” ×‘×ª×¦×•×’×” */
   .tableWrap{ 
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -482,7 +482,7 @@ body{
   }
 }
 
-/* Very small phones - עוד יותר קומפקטי */
+/* Very small phones - ×¢×•×“ ×™×•×ª×¨ ×§×•×ž×¤×§×˜×™ */
 @media (max-width: 400px){
   .leagueTitle{ 
     font-size: 22px;

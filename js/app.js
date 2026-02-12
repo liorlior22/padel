@@ -7,7 +7,6 @@
 
   const POINTS_PER_WIN = 3;
   const $ = (id) => document.getElementById(id);
-
   let cacheRounds = null;
 
   const PLAYER_BIOS = {
@@ -44,7 +43,8 @@
   function normHeader(s) {
     return String(s ?? "")
       .toLowerCase()
-      .replace(/[\u200E\u200F\u202A-\u202E]/g, "")
+      .replace(/[\u200E\u200F\u202A-\u202E]/g, "") // RTL/LTR marks
+      .replace(/\u00A0/g, " ")
       .replace(/\s+/g, "")
       .replace(/[:\-_]/g, "")
       .trim();
@@ -76,7 +76,6 @@
     const all = lines.map(splitLine);
     const headers = (all[0] ?? []).map((h) => String(h ?? "").trim());
     const bodyRaw = all.slice(1);
-
     const body = bodyRaw.filter((r) => r.some((c) => String(c ?? "").trim() !== ""));
 
     const normBody = body.map((r) => {
@@ -131,8 +130,21 @@
     if (!m) return null;
     const a = Number(m[1]), b = Number(m[2]);
     if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
+    // best-of-3 match score only: 2-0 / 2-1
     if (!((a === 2 && (b === 0 || b === 1)) || (b === 2 && (a === 0 || a === 1)))) return null;
     return { a, b };
+  }
+
+  // set games: "6:0" / "6-2" (with hidden chars tolerance)
+  function parseSetGames(s) {
+    const t = String(s ?? "")
+      .replace(/[\u200E\u200F\u202A-\u202E]/g, "")
+      .replace(/\u00A0/g, " ")
+      .trim();
+    if (!t) return null;
+    const m = t.match(/(\d{1,2})\s*[:\-]\s*(\d{1,2})/);
+    if (!m) return null;
+    return { a: Number(m[1]), b: Number(m[2]) };
   }
 
   function parseRoundNumber(v) {
@@ -184,6 +196,31 @@
     return cacheRounds;
   }
 
+  // 🔥 קריטי: לא מסתמכים על iSet1/2/3. סורקים את השורה ומוציאים סטים אמיתיים.
+  function getSetCellsForRow(row, scoreIdx) {
+    const cells = [];
+
+    // עדיף להתחיל אחרי SCORE אם אנחנו יודעים איפה הוא
+    const start = (Number.isInteger(scoreIdx) && scoreIdx >= 0) ? scoreIdx + 1 : 0;
+
+    for (let i = start; i < row.length; i++) {
+      const g = parseSetGames(row[i]);
+      if (g) cells.push(row[i]);
+      if (cells.length === 3) break;
+    }
+
+    // fallback אם SCORE לא במקום / יש עמודות מוזרות: סריקה מלאה
+    if (cells.length === 0) {
+      for (let i = 0; i < row.length; i++) {
+        const g = parseSetGames(row[i]);
+        if (g) cells.push(row[i]);
+        if (cells.length === 3) break;
+      }
+    }
+
+    return cells;
+  }
+
   function computeStandingsFromRounds(rounds) {
     const h = rounds.headers;
     const rows = rounds.rows;
@@ -193,13 +230,16 @@
     const iP2    = (() => { const x = findHeaderIndex(h, ["player2","player 2"]); return x >= 0 ? x : 2; })();
     const iP3    = (() => { const x = findHeaderIndex(h, ["player3","player 3"]); return x >= 0 ? x : 4; })();
     const iP4    = (() => { const x = findHeaderIndex(h, ["player4","player 4"]); return x >= 0 ? x : 5; })();
-    const iScore = (() => { const x = findHeaderIndex(h, ["score","result"]); return x >= 0 ? x : 6; })();
+    const iScore = (() => {
+      const x = findHeaderIndex(h, ["score","result"]);
+      return x >= 0 ? x : 6;
+    })();
 
     const stats = new Map();
     const ensure = (name) => {
       const n = String(name ?? "").trim();
       if (!n || isPlaceholderName(n)) return null;
-      if (!stats.has(n)) stats.set(n, { name:n, points:0, sw:0, sl:0 });
+      if (!stats.has(n)) stats.set(n, { name:n, points:0, sw:0, sl:0, gw:0, gl:0 });
       return stats.get(n);
     };
 
@@ -221,20 +261,32 @@
       const teamB = [p3,p4].filter(x => x && !isPlaceholderName(x));
       if (teamA.length !== 2 || teamB.length !== 2) continue;
 
+      // sets record
       const a = sc.a, b = sc.b;
-
       teamA.forEach(n => { const s = ensure(n); if (s){ s.sw += a; s.sl += b; }});
       teamB.forEach(n => { const s = ensure(n); if (s){ s.sw += b; s.sl += a; }});
 
+      // points
       if (a > b) teamA.forEach(n => { const s = ensure(n); if (s) s.points += POINTS_PER_WIN; });
       else if (b > a) teamB.forEach(n => { const s = ensure(n); if (s) s.points += POINTS_PER_WIN; });
+
+      // games record (auto-detect from row values)
+      const setCells = getSetCellsForRow(r, iScore);
+
+      for (const cell of setCells) {
+        const g = parseSetGames(cell);
+        if (!g) continue;
+        teamA.forEach(n => { const s = ensure(n); if (s){ s.gw += g.a; s.gl += g.b; }});
+        teamB.forEach(n => { const s = ensure(n); if (s){ s.gw += g.b; s.gl += g.a; }});
+      }
     }
 
     const list = Array.from(stats.values());
     list.sort((x,y)=>{
-      const pd = y.points - x.points; if(pd) return pd;
-      const sd = (y.sw - y.sl) - (x.sw - x.sl); if(sd) return sd;
-      const swd = y.sw - x.sw; if(swd) return swd;
+      const pd = y.points - x.points; if (pd) return pd;
+      const sd = (y.sw - y.sl) - (x.sw - x.sl); if (sd) return sd;
+      const swd = y.sw - x.sw; if (swd) return swd;
+      const gd = (y.gw - y.gl) - (x.gw - x.gl); if (gd) return gd;
       return x.name.localeCompare(y.name);
     });
 
@@ -242,116 +294,119 @@
       place: idx+1,
       name: s.name,
       points: s.points,
-      setsRecord: `${s.sw}-${s.sl}`
+      setsRecord: `${s.sw}-${s.sl}`,
+      gamesRecord: `${s.gw}-${s.gl}`
     }));
   }
 
   function renderStandings(tableEl, standings) {
     if (!tableEl) return;
 
-    const headers = ["Place","Player Name","Points","Sets Record"];
-    const thead = `<thead><tr>` + headers.map(h=>`<th>${esc(h.toUpperCase())}</th>`).join("") + `</tr></thead>`;
+    const headers = ["Place","Player Name","Points","Sets Record","Games Record"];
+    const thead =
+      `<thead><tr>` +
+      headers.map(h=>`<th>${esc(h.toUpperCase())}</th>`).join("") +
+      `</tr></thead>`;
 
-    const tbody = `<tbody>` + standings.map(row=>{
-      const cells = [
-        `<td data-label="PLACE">${esc(row.place)}</td>`,
-        `<td data-label="PLAYER NAME">${esc(row.name)}</td>`,
-        `<td data-label="POINTS">${esc(row.points)}</td>`,
-        `<td data-label="SETS RECORD">${esc(row.setsRecord)}</td>`
-      ].join("");
-      return `<tr>${cells}</tr>`;
-    }).join("") + `</tbody>`;
+    const tbody =
+      `<tbody>` +
+      standings.map(row=>{
+        return `<tr>` + [
+          `<td data-label="PLACE">${esc(row.place)}</td>`,
+          `<td data-label="PLAYER NAME">${esc(row.name)}</td>`,
+          `<td data-label="POINTS">${esc(row.points)}</td>`,
+          `<td data-label="SETS RECORD">${esc(row.setsRecord)}</td>`,
+          `<td data-label="GAMES RECORD">${esc(row.gamesRecord)}</td>`
+        ].join("") + `</tr>`;
+      }).join("") +
+      `</tbody>`;
 
     tableEl.innerHTML = thead + tbody;
   }
 
-function renderRoundsTable(tableEl, headers, rows) {
-  if (!tableEl) return;
+  function renderRoundsTable(tableEl, headers, rows) {
+    if (!tableEl) return;
 
-  const idxMap = new Map(headers.map((h,i)=>[normHeader(h), i]));
+    const idxMap = new Map(headers.map((h,i)=>[normHeader(h), i]));
+    const scoreColIndex = idxMap.get("score") ?? idxMap.get("result");
 
-  const scoreColIndex = idxMap.get("score") ?? idxMap.get("result");
+    const pick = (key, fallbacks=[]) => {
+      const i = idxMap.get(key);
+      if (Number.isInteger(i)) return i;
+      for (const f of fallbacks) {
+        const j = idxMap.get(f);
+        if (Number.isInteger(j)) return j;
+      }
+      return null;
+    };
 
-  const pick = (key, fallbacks=[]) => {
-    const i = idxMap.get(key);
-    if (Number.isInteger(i)) return i;
-    for (const f of fallbacks) {
-      const j = idxMap.get(f);
-      if (Number.isInteger(j)) return j;
-    }
-    return null;
-  };
+    const colRound = pick("round", ["rounds"]);
+    const colP1    = pick("player1", ["player 1","p1"]);
+    const colP2    = pick("player2", ["player 2","p2"]);
+    const colVS    = pick("vs", []);
+    const colP3    = pick("player3", ["player 3","p3"]);
+    const colP4    = pick("player4", ["player 4","p4"]);
+    const colScore = Number.isInteger(scoreColIndex) ? scoreColIndex : null;
 
-  const colRound = pick("round", ["rounds"]);
-  const colP1    = pick("player1", ["player 1","p1"]);
-  const colP2    = pick("player2", ["player 2","p2"]);
-  const colVS    = pick("vs", []);
-  const colP3    = pick("player3", ["player 3","p3"]);
-  const colP4    = pick("player4", ["player 4","p4"]);
-  const colScore = Number.isInteger(scoreColIndex) ? scoreColIndex : null;
+    const cols = [
+      {k:"round",  i:colRound,  label:"ROUNDS"},
+      {k:"player1",i:colP1,     label:"PLAYER 1"},
+      {k:"player2",i:colP2,     label:"PLAYER 2"},
+      {k:"vs",     i:colVS,     label:"VS"},
+      {k:"player3",i:colP3,     label:"PLAYER 1"},
+      {k:"player4",i:colP4,     label:"PLAYER 2"},
+      {k:"score",  i:colScore,  label:"SCORE"},
+      {k:"set1",   i:pick("set1", ["set 1"]), label:"SET 1"},
+      {k:"set2",   i:pick("set2", ["set 2"]), label:"SET 2"},
+      {k:"set3",   i:pick("set3", ["set 3"]), label:"SET 3"},
+    ].filter(c => Number.isInteger(c.i));
 
-  const cols = [
-    {k:"round",  i:colRound,  label:"ROUNDS"},
-    {k:"player1",i:colP1,     label:"PLAYER 1"},
-    {k:"player2",i:colP2,     label:"PLAYER 2"},
-    {k:"vs",     i:colVS,     label:"VS"},
-    {k:"player3",i:colP3,     label:"PLAYER 1"},
-    {k:"player4",i:colP4,     label:"PLAYER 2"},
-    {k:"score",  i:colScore,  label:"SCORE"},
-  ].filter(c => Number.isInteger(c.i));
+    const use = cols.length ? cols : headers.map((h,i)=>({k:"value", i, label: String(h||"").toUpperCase()}));
+    const idxScoreOut = use.findIndex(c => c.k === "score");
 
-  const use = cols.length ? cols : headers.map((h,i)=>({k:"value", i, label: String(h||"").toUpperCase()}));
-  const idxScoreOut = use.findIndex(c => c.k === "score");
+    const parseScoreLocal = (s) => {
+      const t = String(s ?? "").trim();
+      if (!t) return null;
+      const clean = t.replace(/[–—−־]/g, "-").replaceAll(":", "-");
+      const m = clean.match(/^(\d+)\s*-\s*(\d+)$/);
+      if (!m) return null;
+      return { a: Number(m[1]), b: Number(m[2]) };
+    };
 
-  const parseScoreLocal = (s) => {
-    const t = String(s ?? "").trim();
-    if (!t) return null;
-    const clean = t.replace(/[–—−־]/g, "-").replaceAll(":", "-");
-    const m = clean.match(/^(\d+)\s*-\s*(\d+)$/);
-    if (!m) return null;
-    return { a: Number(m[1]), b: Number(m[2]) };
-  };
+    const thead =
+      `<thead><tr>` +
+      use.map(c => `<th>${esc(c.label || "")}</th>`).join("") +
+      `</tr></thead>`;
 
-  const thead =
-    `<thead><tr>` +
-    use.map(c => `<th>${esc(c.label || "")}</th>`).join("") +
-    `</tr></thead>`;
+    const tbody =
+      `<tbody>` +
+      rows.map(r => {
+        const sc = (idxScoreOut >= 0) ? parseScoreLocal(r[use[idxScoreOut].i] ?? "") : null;
+        const aWin = sc && sc.a > sc.b;
+        const bWin = sc && sc.b > sc.a;
 
-  const tbody =
-    `<tbody>` +
-    rows.map(r => {
-      const sc = (idxScoreOut >= 0) ? parseScoreLocal(r[use[idxScoreOut].i] ?? "") : null;
-      const aWin = sc && sc.a > sc.b;
-      const bWin = sc && sc.b > sc.a;
+        const tds = use.map(c => {
+          const raw = String(r[c.i] ?? "").trim();
+          const shown = (c.k === "score" && raw) ? raw.replace(/[–—−־]/g,"-") : raw;
 
-      const tds = use.map(c => {
-        const raw = String(r[c.i] ?? "").trim();
-        const shown = (c.k === "score" && raw) ? raw.replace(/[–—−־]/g,"-") : raw;
+          let cls = "";
+          let prefix = "";
 
-        let cls = "";
-        let prefix = "";
-        
-        // 🏆 Gold highlight for winners
-        if (aWin && (c.k === "player1" || c.k === "player2")) { 
-          cls = "winCell"; 
-          prefix = "🏆 "; 
-        }
-        if (bWin && (c.k === "player3" || c.k === "player4")) { 
-          cls = "winCell"; 
-          prefix = "🏆 "; 
-        }
+          if (c.k === "player1" || c.k === "player2") cls = "teamACell";
+          if (c.k === "player3" || c.k === "player4") cls = "teamBCell";
 
-        return `<td data-label="${esc(c.label || "")}" class="${cls}">${esc(prefix + shown)}</td>`;
-      }).join("");
+          if (aWin && (c.k === "player1" || c.k === "player2")) { cls = "teamACell winCell"; prefix = "🏆 "; }
+          if (bWin && (c.k === "player3" || c.k === "player4")) { cls = "teamBCell winCell"; prefix = "🏆 "; }
 
-      return `<tr>${tds}</tr>`;
-    }).join("") +
-    `</tbody>`;
+          return `<td data-label="${esc(c.label || "")}" class="${cls}">${esc(prefix + shown)}</td>`;
+        }).join("");
 
-  tableEl.innerHTML = thead + tbody;
-}
+        return `<tr>${tds}</tr>`;
+      }).join("") +
+      `</tbody>`;
 
-
+    tableEl.innerHTML = thead + tbody;
+  }
 
   function buildPlayersFromRounds(rounds) {
     const box = $("playersList");
@@ -456,7 +511,6 @@ function renderRoundsTable(tableEl, headers, rows) {
   }
 
   function wireUI() {
-    // Show HOME panel by default
     showPanel("panelHome");
 
     $("btnHome")?.addEventListener("click", () => openHome());
